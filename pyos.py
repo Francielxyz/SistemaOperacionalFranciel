@@ -37,29 +37,59 @@ class os_t:
 			self.terminal.console_print("\r" + self.console_str)
 			
 		elif (key == curses.KEY_ENTER) or (key == ord('\n')):
-			self.comando_terminal()
-			self.sair_terminal(self.console_str)
-			self.console_str = ""
+			self.tratar_instrucao()
+			self.console_str = "" 
 			self.terminal.console_print("\r")
-			
 			
 	def handle_interrupt (self, interrupt):
 		if interrupt == pycfg.INTERRUPT_KEYBOARD:
 			self.interrupt_keyboard()
+		return
+	
+	#Tratando a string que eh digitado no console
+	def tratar_instrucao(self):
+		#Remove os espacos em brancos da tecla espaco
+		comando = self.console_str.strip()	
+		
+		if(len(comando) > 0):
+			#Dividir o que foi digitado entre execute nome.asm
+			palavra = comando.split()
 			
-	def sair_terminal(self, console):
-		if console == "sair":
-			self.cpu.cpu_alive = False
+			#Posicao 0 vem ser os comandos de sair ou executar
+			if (palavra[0] == "sair"):
+				self.syscall()
+				self.cpu.cpu_alive = False
+		
+			elif (palavra[0] == "execute"):
+				self.executarProcesso(palavra[1:])	
+				
+			#Caso comando digitado nao exista	
+			else:
+				self.terminal.console_print("\rComando Nao Encontrado no Sistema\n")
+	
+		#Caso usuario nao digite nenhum valor
+		else:
+			self.terminal.console_print("\rDigite Algum Comando\n")
 
-	def syscall (self):
-		#self.terminal.app_print(msg)
+	#Metodo de executar comando digitado
+	def executarProcesso(self, lista):
+		if(lista[0].find(".") >= 0):
+			#posicao 0 eh o nome do arquivo / posicao 1 eh a extensao
+			arquivo = lista[0].split('.') 
+
+			#verificar extesoes que podem ser executadas(apenas 'asm')
+			if(arquivo[1] == "asm"):
+				self.terminal.console_print("\rArquivo Carregado\n")
+			else:
+				self.terminal.console_print("\rExtesao nao Suportada\n")
+
+	def syscall(self):
+		self.terminal.app_print("Interupcao de Teclado Iniciado")
 		return
 
-	def comando_terminal(self):
-		ler = self.console_str.split(" ")
-
-		if(self.console_str == "msg"):
-			if(ler[0] == "msg"):
-				self.sair_terminal(self.console_str)
-			
-			return
+#Estrutura de um processo
+class process_t:
+	pc = int
+	regs = [8]
+	# memoria_t memoria -> descritores de memoria
+	# estado = int
