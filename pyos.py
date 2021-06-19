@@ -1,6 +1,7 @@
 import os
 import curses
 import pycfg
+import time
 from pyarch import load_binary_into_memory
 from pyarch import cpu_t
 
@@ -58,14 +59,15 @@ class os_t:
 			#Posicao 0 vem ser os comandos de sair ou executar
 			if (palavra[0] == "sair"):
 				self.syscall()
+				time.sleep(1)
 				self.cpu.cpu_alive = False
 		
 			elif (palavra[0] == "execute"):
 				self.executarProcesso(palavra[1:])	
 				
 			#Caso comando digitado nao exista	
-			else:
-				self.terminal.console_print("\rComando Nao Encontrado no Sistema\n")
+			# else:
+			# 	self.terminal.console_print("\rComando Nao Encontrado no Sistema\n")
 	
 		#Caso usuario nao digite nenhum valor
 		else:
@@ -83,8 +85,9 @@ class os_t:
 			else:
 				self.terminal.console_print("\rExtesao nao Suportada\n")
 
+	#Mostra na tela a direita mensagemd e fim do Programa
 	def syscall(self):
-		self.terminal.app_print("Interupcao de Teclado Iniciado")
+		self.terminal.app_print("Interupcao de Teclado Iniciado. Fim\n")
 		return
 
 #Estrutura de um processo
