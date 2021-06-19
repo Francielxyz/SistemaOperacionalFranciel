@@ -13,7 +13,7 @@ class os_t:
 		self.terminal.enable_curses()
 
 		self.console_str = ""
-		self.terminal.console_print("this is the console, type the commands here\n")
+		self.terminal.console_print("ESTE EH O CONSOLE, DIGITE OS COMANDO AQUI!\n")
 
 	def printk(self, msg):
 		self.terminal.kernel_print("kernel: " + msg + "\n")
@@ -28,15 +28,38 @@ class os_t:
 		key = self.terminal.get_key_buffer()
 
 		if ((key >= ord('a')) and (key <= ord('z'))) or ((key >= ord('A')) and (key <= ord('Z'))) or ((key >= ord('0')) and (key <= ord('9'))) or (key == ord(' ')) or (key == ord('-')) or (key == ord('_')) or (key == ord('.')):
-			strchar = chr(key)
+		
+			self.console_str = self.console_str + chr(key)
+			self.terminal.console_print("\r" + self.console_str)
+			
 		elif key == curses.KEY_BACKSPACE:
-			return
+			self.console_str = self.console_str[:-1]
+			self.terminal.console_print("\r" + self.console_str)
+			
 		elif (key == curses.KEY_ENTER) or (key == ord('\n')):
-			return
-
+			self.comando_terminal()
+			self.sair_terminal(self.console_str)
+			self.console_str = ""
+			self.terminal.console_print("\r")
+			
+			
 	def handle_interrupt (self, interrupt):
-		return
+		if interrupt == pycfg.INTERRUPT_KEYBOARD:
+			self.interrupt_keyboard()
+			
+	def sair_terminal(self, console):
+		if console == "sair":
+			self.cpu.cpu_alive = False
 
 	def syscall (self):
 		#self.terminal.app_print(msg)
 		return
+
+	def comando_terminal(self):
+		ler = self.console_str.split(" ")
+
+		if(self.console_str == "msg"):
+			if(ler[0] == "msg"):
+				self.sair_terminal(self.console_str)
+			
+			return
